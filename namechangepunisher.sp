@@ -6,7 +6,7 @@
 #undef REQUIRE_PLUGIN
 #include <sourcebans>
 
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 
 
 public Plugin:myinfo = 
@@ -146,15 +146,48 @@ public Action:OnNameChange(Handle:event, const String:name[], bool:dontBroadcast
 				{
 					LogMessage("Banned %s (%d) for having %d name changes.", userName, userId, g_NameChangeCount[client]);
 				}
+
+
+				// Tell admins about  ban
+				for (new iAdm = 1; iAdm <= MaxClients; iAdm++)
+				{
+					if (IsClientInGame(iAdm))
+					{
+						// print only to admins
+						if (GetUserAdmin(iAdm) != INVALID_ADMIN_ID)
+						{
+							PrintToChat(iAdm, "[NameChangePunisher] \x04(ADMINS) \x01Banned %s (%d) for having %d name changes.", userName, userId, g_NameChangeCount[client]);
+						}	
+					}
+
+				}
+				
+
 			}
 			else
 			{
 				// Kick
 				KickClient(client, "%t", "Kick Reason");
+				
 				if (GetConVarBool(g_Cvar_Debug))
 				{
 					LogMessage("Kicked %s (%d) for having %d name changes.", userName, userId, g_NameChangeCount[client]);
 				}
+			
+				// Tell admins about kick
+				for (new iAdm = 1; iAdm <= MaxClients; iAdm++)
+				{
+					if (IsClientInGame(iAdm))
+					{
+						// print only to admins
+						if (GetUserAdmin(iAdm) != INVALID_ADMIN_ID)
+						{
+							PrintToChat(iAdm, "[NameChangePunisher] \x04(ADMINS) \x01Kicked %s (%d) for having %d name changes.", userName, userId, g_NameChangeCount[client]);
+						}	
+					}
+				}
+
+			
 			}
 		}
 		else
